@@ -80,8 +80,6 @@ var LlmSummarizerPrefs = {
     ]
   },
 
-  draggedItem: null,
-
   init: function() {
     Zotero.debug('LLM Summarizer Prefs: initializing...');
 
@@ -211,7 +209,7 @@ var LlmSummarizerPrefs = {
     }
   },
 
-  // ==================== Provider Chain (Drag & Drop) ====================
+  // ==================== Provider Chain (Arrow Buttons) ====================
 
   buildProviderChainList: function() {
     const container = document.getElementById('provider-chain-list');
@@ -230,13 +228,32 @@ var LlmSummarizerPrefs = {
     chain.forEach((providerId, index) => {
       const provider = this.providers[providerId];
       const hasKey = !!this.getPref('apiKey.' + providerId);
+      const isFirst = index === 0;
+      const isLast = index === chain.length - 1;
 
       const row = document.createXULElement('hbox');
       row.setAttribute('id', 'chain-item-' + providerId);
       row.setAttribute('data-provider', providerId);
       row.setAttribute('align', 'center');
-      row.setAttribute('draggable', 'true');
-      row.style.cssText = 'padding: 6px 8px; margin: 2px 0; background: ' + (hasKey ? '#e8f5e9' : '#fff3e0') + '; border-radius: 4px; cursor: grab;';
+      row.style.cssText = 'padding: 6px 8px; margin: 2px 0; background: ' + (hasKey ? '#e8f5e9' : '#fff3e0') + '; border-radius: 4px;';
+
+      // Up button
+      const upBtn = document.createXULElement('button');
+      upBtn.setAttribute('label', '▲');
+      upBtn.setAttribute('tooltiptext', 'Move up');
+      upBtn.disabled = isFirst;
+      upBtn.style.cssText = 'min-width: 28px; padding: 2px 6px; margin-right: 4px;';
+      upBtn.addEventListener('command', () => this.moveProvider(providerId, -1));
+      row.appendChild(upBtn);
+
+      // Down button
+      const downBtn = document.createXULElement('button');
+      downBtn.setAttribute('label', '▼');
+      downBtn.setAttribute('tooltiptext', 'Move down');
+      downBtn.disabled = isLast;
+      downBtn.style.cssText = 'min-width: 28px; padding: 2px 6px; margin-right: 8px;';
+      downBtn.addEventListener('command', () => this.moveProvider(providerId, 1));
+      row.appendChild(downBtn);
 
       // Priority number
       const numLabel = document.createXULElement('label');
@@ -261,55 +278,31 @@ var LlmSummarizerPrefs = {
       statusLabel.style.cssText = 'color: ' + (hasKey ? 'green' : '#999') + ';';
       row.appendChild(statusLabel);
 
-      // Drag events
-      row.addEventListener('dragstart', (e) => this.onDragStart(e, providerId));
-      row.addEventListener('dragover', (e) => this.onDragOver(e));
-      row.addEventListener('drop', (e) => this.onDrop(e, providerId));
-      row.addEventListener('dragend', () => this.onDragEnd());
-
       container.appendChild(row);
     });
   },
 
-  onDragStart: function(e, providerId) {
-    this.draggedItem = providerId;
-    e.target.style.opacity = '0.5';
-  },
-
-  onDragOver: function(e) {
-    e.preventDefault();
-  },
-
-  onDrop: function(e, targetProviderId) {
-    e.preventDefault();
-    if (!this.draggedItem || this.draggedItem === targetProviderId) return;
-
+  moveProvider: function(providerId, direction) {
     // Get current chain
     const chainStr = this.getPref('providerChain') || this.providerList.join(',');
     const chain = chainStr.split(',');
 
-    // Remove dragged item
-    const draggedIndex = chain.indexOf(this.draggedItem);
-    if (draggedIndex > -1) {
-      chain.splice(draggedIndex, 1);
-    }
+    // Find current index
+    const currentIndex = chain.indexOf(providerId);
+    if (currentIndex === -1) return;
 
-    // Insert at new position
-    const targetIndex = chain.indexOf(targetProviderId);
-    chain.splice(targetIndex, 0, this.draggedItem);
+    // Calculate new index
+    const newIndex = currentIndex + direction;
+    if (newIndex < 0 || newIndex >= chain.length) return;
+
+    // Swap positions
+    const temp = chain[newIndex];
+    chain[newIndex] = chain[currentIndex];
+    chain[currentIndex] = temp;
 
     // Save and rebuild
     this.setPref('providerChain', chain.join(','));
     this.buildProviderChainList();
-  },
-
-  onDragEnd: function() {
-    this.draggedItem = null;
-    // Reset all opacities
-    this.providerList.forEach(p => {
-      const row = document.getElementById('chain-item-' + p);
-      if (row) row.style.opacity = '1';
-    });
   },
 
   // ==================== Status Updates ====================
