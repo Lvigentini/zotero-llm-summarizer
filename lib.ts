@@ -30,8 +30,18 @@ const DEFAULT_PROMPT = `You are a senior research scientist skilled at synthesiz
 - Actionable Insights: End with concrete observations—gaps to address, methods to adopt, connections to explore
 
 ## Output Format
-Provide a clear, structured summary that would help a researcher quickly understand the content.
-Use clear headings, extended points for discrete findings, numbered lists for sequential arguments, brief direct quotes for pivotal formulations, and tables when comparing multiple papers. Always include a synthesis section drawing together the big picture.`
+IMPORTANT: Format your response using proper Markdown syntax. Do NOT escape markdown characters with backslashes.
+
+Use these formatting conventions:
+- **Bold** for emphasis (use **text** not \\*\\*text\\*\\*)
+- *Italics* for terms and titles (use *text* not \\*text\\*)
+- ## Headings for major sections (use ## not \\#\\#)
+- - Bullet points for lists (use - not \\-)
+- 1. Numbered lists for sequences
+- > Blockquotes for direct quotations
+- --- for horizontal rules (use --- not \\---)
+
+Structure your response with clear headings, bullet points for discrete findings, numbered lists for sequential arguments, and brief direct quotes for pivotal formulations. Always include a synthesis section drawing together the big picture.`
 
 // LLM Provider configurations
 const PROVIDERS: Record<string, { name: string, icon: string, endpoint: string, models: { id: string, name: string }[] }> = {
