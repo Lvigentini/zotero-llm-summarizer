@@ -1,6 +1,6 @@
 # 🤖 Zotero LLM Summarizer
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/Lvigentini/zotero-llm-summarizer/releases)
+[![Version](https://img.shields.io/badge/version-1.2.1-blue.svg)](https://github.com/Lvigentini/zotero-llm-summarizer/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Zotero](https://img.shields.io/badge/Zotero-7.0+-red.svg)](https://www.zotero.org/)
 
@@ -83,6 +83,8 @@
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+> ⚠️ **Note on PDF Text:** This plugin summarises **notes**, not PDF files directly. To summarise PDF content, you first need to extract the text into a note. We recommend using [zotero-ocr](https://github.com/UB-Mannheim/zotero-ocr) for this. Built-in PDF text extraction is on our [roadmap](docs/ROADMAP.md).
 
 ---
 
@@ -351,7 +353,7 @@ zotero-llm-summarizer/
 │   ├── prefs.js          # Default values
 │   └── icon.svg          # Plugin icon
 ├── 📁 docs/
-│   └── ROADMAP-premium-features.md
+│   └── ROADMAP.md        # Future plans
 └── 📁 xpi/               # Built plugin
 ```
 
