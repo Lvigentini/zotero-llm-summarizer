@@ -7,8 +7,10 @@ A Zotero 7 plugin that generates AI-powered summaries of research notes using mu
 - **Multi-Provider Support**: Configure and use multiple LLM providers simultaneously
   - Claude (Anthropic)
   - OpenAI (GPT-4.1)
+  - Grok (xAI)
   - Google Gemini
-  - OpenRouter (access to DeepSeek, Qwen, Mistral, Grok, and more)
+  - Ollama (Local LLMs)
+  - OpenRouter (access to DeepSeek, Qwen, Mistral, and more)
 
 - **Smart Provider Selection**: Right-click context menu shows available providers with API keys configured
 
@@ -42,7 +44,9 @@ A Zotero 7 plugin that generates AI-powered summaries of research notes using mu
 3. Configure your API keys for the providers you want to use:
    - **Claude**: Get your API key from [Anthropic Console](https://console.anthropic.com/)
    - **OpenAI**: Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+   - **Grok**: Get your API key from [xAI Console](https://console.x.ai/)
    - **Google Gemini**: Get your API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - **Ollama**: Install [Ollama](https://ollama.ai/) locally and type "enabled" in the field
    - **OpenRouter**: Get your API key from [OpenRouter](https://openrouter.ai/keys)
 
 4. Select your preferred model for each provider
@@ -73,10 +77,28 @@ A Zotero 7 plugin that generates AI-powered summaries of research notes using mu
 - GPT-4o
 - GPT-4o Mini
 
+### Grok (xAI Direct)
+- Grok 3 (Latest)
+- Grok 3 Mini (Fast)
+- Grok 4
+- Grok 4 Fast
+
 ### Google Gemini (Direct)
 - Gemini 2.0 Flash (Latest)
 - Gemini 2.0 Flash Lite (Fast)
 - Gemini 2.5 Flash Lite
+
+### Ollama (Local)
+Run LLMs locally on your machine:
+- Llama 3.3 (Default)
+- Llama 3.2
+- Mistral
+- Mixtral
+- Qwen 2.5
+- DeepSeek R1
+- Phi-4
+- Gemma 2
+- Code Llama
 
 ### OpenRouter (Access to Many Providers)
 - DeepSeek R1, V3.1 Chat, Chat
@@ -134,6 +156,17 @@ npm run build    # Full build with linting
 npm run lint     # Run ESLint
 npm run lint:fix # Fix linting issues
 ```
+
+### Creating Releases
+
+1. Update the version in `package.json`
+2. Build the plugin: `npm run build`
+3. Commit changes: `git add -A && git commit -m "Release vX.Y.Z"`
+4. Create a tag: `git tag -a vX.Y.Z -m "Version X.Y.Z"`
+5. Push: `git push && git push --tags`
+6. Go to GitHub → Releases → "Draft a new release"
+7. Select the tag, write release notes, and attach the XPI file from `xpi/` folder
+   - Rename to `zotero-llm-summarizer-X.Y.Z.xpi` before uploading
 
 ### Testing
 
