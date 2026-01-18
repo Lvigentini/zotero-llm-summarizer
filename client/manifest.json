@@ -2,7 +2,13 @@
   "manifest_version": 2,
   "name": "LLM Summarizer",
   "version": "0.0.1",
-  "description": "AI-powered summarization for Zotero notes using Claude, OpenAI, Gemini, or OpenRouter",
+  "description": "AI-powered summarization for Zotero notes using Claude, OpenAI, Grok, Gemini, Ollama, or OpenRouter. BYO API key - no middleman.",
+  "author": "Lorenzo Vigentini (CogentixAI)",
+  "homepage_url": "https://github.com/Lvigentini/zotero-llm-summarizer",
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg"
+  },
   "applications": {
     "zotero": {
       "id": "zotero-llm-summarizer@cogentixai.com",
