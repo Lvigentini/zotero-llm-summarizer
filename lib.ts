@@ -584,7 +584,7 @@ Zotero.LlmSummarizer = new class {
       .replace(/-\d{8}$/, '')
       .replace(/[^a-zA-Z0-9.-]/g, '')
 
-    return `${author}_${year}_${shortModel}_summary`
+    return `[AI] ${author}_${year}_${shortModel}_summary`
   }
 
   async createSummaryNote(parentItem: any, summary: string, provider: string, model: string): Promise<any> {
@@ -620,6 +620,8 @@ ${paragraphs}
     }
 
     note.setNote(noteContent)
+    // Add tag for easy filtering/searching
+    note.addTag('LLM-note')
     await note.saveTx()
 
     this.log(`Created summary note ${note.id} for item ${parentItem.id}`)
