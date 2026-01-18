@@ -594,7 +594,7 @@ Zotero.LlmSummarizer = new class {
       .replace(/-\d{8}$/, '')
       .replace(/[^a-zA-Z0-9.-]/g, '')
 
-    return `[AI] ${author}_${year}_${shortModel}_summary`
+    return `[LLM-note] ${author}_${year}_${shortModel}_summary`
   }
 
   async createSummaryNote(parentItem: any, summary: string, provider: string, model: string): Promise<any> {
@@ -630,8 +630,15 @@ ${paragraphs}
     }
 
     note.setNote(noteContent)
-    // Add tag for easy filtering/searching
+    // Add tags for easy filtering/searching
     note.addTag('LLM-note')
+    note.addTag('AI')
+    note.addTag('summary')
+    // Add model tag (shortened)
+    const shortModelTag = model
+      .replace(/^(anthropic\/|openai\/|google\/|meta-llama\/|deepseek\/|qwen\/|mistralai\/|x-ai\/)/, '')
+      .replace(/-\d{8}$/, '')
+    note.addTag(shortModelTag)
     await note.saveTx()
 
     this.log(`Created summary note ${note.id} for item ${parentItem.id}`)
@@ -715,6 +722,295 @@ ${paragraphs}
       this.logError('Error generating summary', e)
       this.showAlert(`Error generating summary: ${e.message}`)
     }
+  }
+
+  // =====================
+  // Batch Processing (multiple items)
+  // =====================
+
+  async summarizeBatch() {
+    const zp = Zotero.getActiveZoteroPane()
+    const items = zp.getSelectedItems()
+    const regularItems = items.filter((item: any) => !item.isNote() && !item.isAttachment())
+
+    if (regularItems.length === 0) {
+      this.showAlert('No items selected.')
+      return
+    }
+
+    const availableProviders = this.getAvailableProviders()
+    if (availableProviders.length === 0) {
+      this.showAlert('Please configure at least one API key in Zotero Preferences > LLM Summarizer.')
+      return
+    }
+
+    let successCount = 0
+    let skipCount = 0
+    let errorCount = 0
+
+    this.showProgress(`Processing ${regularItems.length} items...`)
+
+    for (let i = 0; i < regularItems.length; i++) {
+      const item = regularItems[i]
+      this.showProgress(`Processing item ${i + 1} of ${regularItems.length}...`)
+
+      try {
+        const content = await this.getNotesContent(item)
+        if (!content) {
+          skipCount++
+          this.log(`Skipping item ${item.id} - no notes`)
+          continue
+        }
+
+        const summary = await this.generateSummary(content)
+        const usedProvider = this.lastUsedProvider || this.getFirstAvailableProvider() || 'claude'
+        const usedModel = this.lastUsedModel || this.getProviderModel(usedProvider)
+
+        await this.createSummaryNote(item, summary, usedProvider, usedModel)
+        successCount++
+      }
+      catch (e: any) {
+        errorCount++
+        this.logError(`Error processing item ${item.id}`, e)
+      }
+    }
+
+    this.hideProgress()
+    this.showAlert(`Batch complete: ${successCount} summaries created, ${skipCount} skipped (no notes), ${errorCount} errors.`, successCount > 0 ? 'success' : 'error')
+  }
+
+  async summarizeDigest() {
+    const zp = Zotero.getActiveZoteroPane()
+    const items = zp.getSelectedItems()
+    const regularItems = items.filter((item: any) => !item.isNote() && !item.isAttachment())
+
+    if (regularItems.length === 0) {
+      this.showAlert('No items selected.')
+      return
+    }
+
+    const availableProviders = this.getAvailableProviders()
+    if (availableProviders.length === 0) {
+      this.showAlert('Please configure at least one API key in Zotero Preferences > LLM Summarizer.')
+      return
+    }
+
+    this.showProgress(`Collecting notes from ${regularItems.length} items...`)
+
+    // Collect all notes from all items
+    const allContent: string[] = []
+    for (const item of regularItems) {
+      const content = await this.getNotesContent(item)
+      if (content) {
+        const creators = item.getCreators()
+        const author = creators?.[0]?.lastName || 'Unknown'
+        const title = item.getField('title') || 'Untitled'
+        allContent.push(`## ${author}: ${title}\n\n${content}`)
+      }
+    }
+
+    if (allContent.length === 0) {
+      this.hideProgress()
+      this.showAlert('No notes found in selected items.')
+      return
+    }
+
+    const combinedContent = allContent.join('\n\n---\n\n')
+    const digestPrompt = `Create a simple digest of the following research notes. Do not add additional analysis - just compile and organize the key points from each source.\n\n${combinedContent}`
+
+    this.showProgress('Generating digest...')
+
+    try {
+      const summary = await this.generateSummary(digestPrompt)
+      const usedProvider = this.lastUsedProvider || this.getFirstAvailableProvider() || 'claude'
+      const usedModel = this.lastUsedModel || this.getProviderModel(usedProvider)
+
+      // Create digest note attached to first item
+      await this.createDigestNote(regularItems[0], summary, usedProvider, usedModel, regularItems.length)
+
+      this.hideProgress()
+      this.showAlert(`Digest created from ${regularItems.length} items with ${PROVIDERS[usedProvider]?.name || usedProvider}!`, 'success')
+    }
+    catch (e: any) {
+      this.hideProgress()
+      this.logError('Error generating digest', e)
+      this.showAlert(`Error generating digest: ${e.message}`)
+    }
+  }
+
+  async summarizeCollectionBatch(collectionId: number) {
+    const collection = await Zotero.Collections.getAsync(collectionId)
+    if (!collection) {
+      this.showAlert('Collection not found.')
+      return
+    }
+
+    const itemIds = collection.getChildItems()
+    const items = await Zotero.Items.getAsync(itemIds)
+    const regularItems = items.filter((item: any) => !item.isNote() && !item.isAttachment())
+
+    if (regularItems.length === 0) {
+      this.showAlert('No items in collection.')
+      return
+    }
+
+    const availableProviders = this.getAvailableProviders()
+    if (availableProviders.length === 0) {
+      this.showAlert('Please configure at least one API key in Zotero Preferences > LLM Summarizer.')
+      return
+    }
+
+    let successCount = 0
+    let skipCount = 0
+    let errorCount = 0
+
+    this.showProgress(`Processing ${regularItems.length} items from "${collection.name}"...`)
+
+    for (let i = 0; i < regularItems.length; i++) {
+      const item = regularItems[i]
+      this.showProgress(`Processing item ${i + 1} of ${regularItems.length}...`)
+
+      try {
+        const content = await this.getNotesContent(item)
+        if (!content) {
+          skipCount++
+          continue
+        }
+
+        const summary = await this.generateSummary(content)
+        const usedProvider = this.lastUsedProvider || this.getFirstAvailableProvider() || 'claude'
+        const usedModel = this.lastUsedModel || this.getProviderModel(usedProvider)
+
+        await this.createSummaryNote(item, summary, usedProvider, usedModel)
+        successCount++
+      }
+      catch (e: any) {
+        errorCount++
+        this.logError(`Error processing item ${item.id}`, e)
+      }
+    }
+
+    this.hideProgress()
+    this.showAlert(`Batch complete: ${successCount} summaries created, ${skipCount} skipped (no notes), ${errorCount} errors.`, successCount > 0 ? 'success' : 'error')
+  }
+
+  async summarizeCollectionDigest(collectionId: number) {
+    const collection = await Zotero.Collections.getAsync(collectionId)
+    if (!collection) {
+      this.showAlert('Collection not found.')
+      return
+    }
+
+    const itemIds = collection.getChildItems()
+    const items = await Zotero.Items.getAsync(itemIds)
+    const regularItems = items.filter((item: any) => !item.isNote() && !item.isAttachment())
+
+    if (regularItems.length === 0) {
+      this.showAlert('No items in collection.')
+      return
+    }
+
+    const availableProviders = this.getAvailableProviders()
+    if (availableProviders.length === 0) {
+      this.showAlert('Please configure at least one API key in Zotero Preferences > LLM Summarizer.')
+      return
+    }
+
+    this.showProgress(`Collecting notes from "${collection.name}"...`)
+
+    // Collect all notes
+    const allContent: string[] = []
+    for (const item of regularItems) {
+      const content = await this.getNotesContent(item)
+      if (content) {
+        const creators = item.getCreators()
+        const author = creators?.[0]?.lastName || 'Unknown'
+        const title = item.getField('title') || 'Untitled'
+        allContent.push(`## ${author}: ${title}\n\n${content}`)
+      }
+    }
+
+    if (allContent.length === 0) {
+      this.hideProgress()
+      this.showAlert('No notes found in collection.')
+      return
+    }
+
+    const combinedContent = allContent.join('\n\n---\n\n')
+    const digestPrompt = `Create a simple digest of the following research notes from the collection "${collection.name}". Do not add additional analysis - just compile and organize the key points from each source.\n\n${combinedContent}`
+
+    this.showProgress('Generating collection digest...')
+
+    try {
+      const summary = await this.generateSummary(digestPrompt)
+      const usedProvider = this.lastUsedProvider || this.getFirstAvailableProvider() || 'claude'
+      const usedModel = this.lastUsedModel || this.getProviderModel(usedProvider)
+
+      // Create digest note attached to first item
+      await this.createDigestNote(regularItems[0], summary, usedProvider, usedModel, regularItems.length, collection.name)
+
+      this.hideProgress()
+      this.showAlert(`Collection digest created from ${regularItems.length} items with ${PROVIDERS[usedProvider]?.name || usedProvider}!`, 'success')
+    }
+    catch (e: any) {
+      this.hideProgress()
+      this.logError('Error generating collection digest', e)
+      this.showAlert(`Error generating digest: ${e.message}`)
+    }
+  }
+
+  async createDigestNote(parentItem: any, summary: string, provider: string, model: string, itemCount: number, collectionName?: string): Promise<any> {
+    const providerConfig = PROVIDERS[provider]
+    const outputFormat = this.getPref('outputFormat') || 'markdown'
+    const date = new Date().toLocaleDateString('en-AU', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+
+    const shortModel = model
+      .replace(/^(anthropic\/|openai\/|google\/|meta-llama\/|deepseek\/|qwen\/|mistralai\/|x-ai\/)/, '')
+      .replace(/-\d{8}$/, '')
+      .replace(/[^a-zA-Z0-9.-]/g, '')
+
+    const noteTitle = collectionName
+      ? `[LLM-note] ${collectionName}_digest_${shortModel}`
+      : `[LLM-note] digest_${itemCount}items_${shortModel}`
+
+    const note = new Zotero.Item('note')
+    note.parentItemID = parentItem.id
+    note.libraryID = parentItem.libraryID
+
+    let noteContent: string
+
+    if (outputFormat === 'markdown') {
+      noteContent = `<h1>${noteTitle}</h1>
+<p><em>Digest of ${itemCount} items${collectionName ? ` from "${collectionName}"` : ''}</em></p>
+<div class="llm-summary">
+${this.markdownToHtml(summary)}
+</div>
+<hr/>
+<p><em>Generated by ${providerConfig?.name || provider} (${model}) on ${date}</em></p>`
+    }
+    else {
+      const paragraphs = summary.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('')
+      noteContent = `<h1>${noteTitle}</h1>
+<p><em>Digest of ${itemCount} items${collectionName ? ` from "${collectionName}"` : ''}</em></p>
+${paragraphs}
+<hr/>
+<p><em>Generated by ${providerConfig?.name || provider} (${model}) on ${date}</em></p>`
+    }
+
+    note.setNote(noteContent)
+    // Add tags for easy filtering/searching
+    note.addTag('LLM-note')
+    note.addTag('AI')
+    note.addTag('digest')
+    note.addTag(shortModel)
+    await note.saveTx()
+
+    this.log(`Created digest note ${note.id} from ${itemCount} items`)
+    return note
   }
 
   // =====================

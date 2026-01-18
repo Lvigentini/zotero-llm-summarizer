@@ -27,9 +27,9 @@ A Zotero 7 plugin that generates AI-powered summaries of research notes using mu
 
 - **Flexible Output**: Choose between Markdown or plain text formatting
 
-- **Intelligent Note Naming**: Generated notes are prefixed with `[AI]` and named `[AI] Author_Year_Model_summary`
+- **Intelligent Note Naming**: Generated notes are prefixed with `[LLM-note]` and named `[LLM-note] Author_Year_Model_summary`
 
-- **Easy Filtering**: All summary notes are automatically tagged with `LLM-note` for quick filtering in Zotero's Tags pane
+- **Easy Filtering**: All summary notes are automatically tagged with `LLM-note`, `AI`, `summary`, and the model name (e.g., `gpt-4.1`) for flexible filtering in Zotero's Tags pane
 
 ## Installation
 
