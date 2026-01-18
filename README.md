@@ -27,7 +27,9 @@ A Zotero 7 plugin that generates AI-powered summaries of research notes using mu
 
 - **Flexible Output**: Choose between Markdown or plain text formatting
 
-- **Intelligent Note Naming**: Generated notes are named `[Author]_[Year]_[Model]_summary`
+- **Intelligent Note Naming**: Generated notes are prefixed with `[AI]` and named `[AI] Author_Year_Model_summary`
+
+- **Easy Filtering**: All summary notes are automatically tagged with `LLM-note` for quick filtering in Zotero's Tags pane
 
 ## Installation
 
@@ -174,9 +176,54 @@ npm run lint:fix # Fix linting issues
 2. Install the XPI from `xpi/` folder into Zotero
 3. To reload changes, disable and re-enable the plugin in Zotero's Add-ons manager
 
-## Custom Prompt
+## Prompts and Customisation
 
-You can override the default research synthesis prompt in the **Advanced** section of the settings. Leave empty to use the built-in prompt optimized for academic research.
+### Default Prompt
+
+The built-in prompt is designed for academic research synthesis. It instructs the LLM to act as a senior research scientist with strengths in big-picture thinking, pattern recognition, and citation network analysis. The default output structure includes:
+
+1. **Key Findings and Main Arguments** — Central thesis, primary claims, empirical vs theoretical distinctions
+2. **Methodology** — Research design, sample characteristics, validity concerns, generalisability
+3. **Important Concepts and Definitions** — Key terminology and theoretical frameworks
+4. **Relevance and Implications** — Significance for theory and practice, open questions
+5. **Citation Network Analysis** — Foundational works, intellectual lineages, interdisciplinary bridges
+
+The prompt emphasises epistemic honesty (hedged language like "suggests" rather than "proves"), synthesis over summary, and actionable insights.
+
+### Custom Prompts
+
+You can override the default prompt in **Settings → LLM Summarizer → Advanced**. Leave empty to use the built-in prompt.
+
+**Tips for effective custom prompts:**
+
+- **Be specific about output structure** — Tell the LLM exactly what sections or headings you want
+- **Define the persona** — "You are a [role] skilled at [task]" helps set appropriate tone and expertise
+- **Specify the audience** — "Write for graduate students" vs "Write for domain experts" yields different results
+- **Include formatting instructions** — Request bullet points, numbered lists, tables, or specific markdown formatting
+- **Set constraints** — Word limits, required sections, or things to avoid (e.g., "Do not include recommendations")
+
+**Example custom prompts:**
+
+```
+Summarise these notes as a literature review paragraph suitable for a thesis chapter.
+Focus on how the studies relate to each other and identify gaps in the research.
+Use formal academic language and include in-text citations where authors are mentioned.
+```
+
+```
+Create a structured summary with these exact sections:
+- Research Question
+- Key Finding (one sentence)
+- Method (brief)
+- Limitations
+- How this relates to [your specific research topic]
+```
+
+```
+You are a research assistant helping prepare for a journal club presentation.
+Summarise the key points that would generate discussion, highlight methodological
+choices that could be debated, and suggest 3 discussion questions for the group.
+```
 
 ## Error Handling
 
