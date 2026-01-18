@@ -1,6 +1,6 @@
 {
   "name": "zotero-llm-summarizer",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "AI-powered summarization for Zotero notes",
   "scripts": {
     "lint": "eslint . --ext .ts --cache --cache-location .eslintcache/",

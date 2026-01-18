@@ -59,6 +59,17 @@ const PROVIDERS: Record<string, { name: string, icon: string, endpoint: string, 
       { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
     ],
   },
+  grok: {
+    name: 'Grok (xAI)',
+    icon: '⚡',
+    endpoint: 'https://api.x.ai/v1/chat/completions',
+    models: [
+      { id: 'grok-3', name: 'Grok 3 (Latest)' },
+      { id: 'grok-3-mini', name: 'Grok 3 Mini (Fast)' },
+      { id: 'grok-4', name: 'Grok 4' },
+      { id: 'grok-4-fast', name: 'Grok 4 Fast' },
+    ],
+  },
   gemini: {
     name: 'Gemini (Google)',
     icon: '🔵',
@@ -67,6 +78,22 @@ const PROVIDERS: Record<string, { name: string, icon: string, endpoint: string, 
       { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash (Latest)' },
       { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite (Fast)' },
       { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite' },
+    ],
+  },
+  ollama: {
+    name: 'Ollama (Local)',
+    icon: '🦙',
+    endpoint: 'http://localhost:11434/v1/chat/completions',
+    models: [
+      { id: 'llama3.3', name: 'Llama 3.3 (Default)' },
+      { id: 'llama3.2', name: 'Llama 3.2' },
+      { id: 'mistral', name: 'Mistral' },
+      { id: 'mixtral', name: 'Mixtral' },
+      { id: 'qwen2.5', name: 'Qwen 2.5' },
+      { id: 'deepseek-r1', name: 'DeepSeek R1' },
+      { id: 'phi4', name: 'Phi-4' },
+      { id: 'gemma2', name: 'Gemma 2' },
+      { id: 'codellama', name: 'Code Llama' },
     ],
   },
   openrouter: {
@@ -86,7 +113,7 @@ const PROVIDERS: Record<string, { name: string, icon: string, endpoint: string, 
       { id: 'mistralai/mistral-large-2411', name: 'Mistral Large' },
       { id: 'mistralai/mistral-small-3.1-24b-instruct', name: 'Mistral Small 3.1' },
       { id: 'mistralai/codestral-2508', name: 'Codestral' },
-      // Grok
+      // Grok via OpenRouter
       { id: 'x-ai/grok-3', name: 'Grok 3' },
       { id: 'x-ai/grok-3-mini', name: 'Grok 3 Mini (Fast)' },
       // Claude via OpenRouter
@@ -159,7 +186,15 @@ Zotero.LlmSummarizer = new class {
   }
 
   getAvailableProviders(): string[] {
-    return this.getProviderChain().filter(p => !!this.getProviderApiKey(p))
+    return this.getProviderChain().filter(p => {
+      // Ollama doesn't need an API key - check if endpoint is configured (use "enabled" as placeholder)
+      if (p === 'ollama') {
+        const ollamaKey = this.getProviderApiKey(p)
+        // User can put anything in the key field to enable Ollama (e.g., "enabled" or "local")
+        return !!ollamaKey
+      }
+      return !!this.getProviderApiKey(p)
+    })
   }
 
   getFirstAvailableProvider(): string | null {
@@ -349,12 +384,82 @@ Zotero.LlmSummarizer = new class {
     return data.choices[0].message.content
   }
 
+  async callGrok(content: string, apiKey: string, model: string, endpoint: string, prompt: string): Promise<string> {
+    this.log(`Calling Grok (xAI) API with model ${model}`)
+
+    // Grok uses OpenAI-compatible API format
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 4096,
+        messages: [
+          {
+            role: 'system',
+            content: prompt,
+          },
+          {
+            role: 'user',
+            content: `Notes to summarize:\n\n${content}`,
+          },
+        ],
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Grok API error (${response.status}): ${errorText}`)
+    }
+
+    const data = await response.json()
+    return data.choices[0].message.content
+  }
+
+  async callOllama(content: string, _apiKey: string, model: string, endpoint: string, prompt: string): Promise<string> {
+    this.log(`Calling Ollama (local) with model ${model}`)
+
+    // Ollama uses OpenAI-compatible API format, no auth required
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: prompt,
+          },
+          {
+            role: 'user',
+            content: `Notes to summarize:\n\n${content}`,
+          },
+        ],
+        stream: false,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Ollama error (${response.status}): ${errorText}`)
+    }
+
+    const data = await response.json()
+    return data.choices[0].message.content
+  }
+
   async callProvider(provider: string, content: string, prompt: string): Promise<string> {
     const apiKey = this.getProviderApiKey(provider)
     const model = this.getProviderModel(provider)
     const endpoint = this.getProviderEndpoint(provider)
 
-    if (!apiKey) {
+    // Ollama doesn't require API key, others do
+    if (!apiKey && provider !== 'ollama') {
       throw new Error(`No API key configured for ${provider}`)
     }
 
@@ -367,8 +472,12 @@ Zotero.LlmSummarizer = new class {
         return this.callClaude(content, apiKey, model, endpoint, prompt)
       case 'openai':
         return this.callOpenAI(content, apiKey, model, endpoint, prompt)
+      case 'grok':
+        return this.callGrok(content, apiKey, model, endpoint, prompt)
       case 'gemini':
         return this.callGemini(content, apiKey, model, endpoint, prompt)
+      case 'ollama':
+        return this.callOllama(content, apiKey, model, endpoint, prompt)
       case 'openrouter':
         return this.callOpenRouter(content, apiKey, model, endpoint, prompt)
       default:

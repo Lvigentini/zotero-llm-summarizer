@@ -49,6 +49,23 @@
     <description id="status-openai" style="margin-top: 4px;"/>
   </groupbox>
 
+  <!-- Grok (xAI) Settings -->
+  <groupbox id="provider-grok-box">
+    <label><html:h2>Grok (xAI)</html:h2></label>
+    <hbox align="center">
+      <label value="API Key:" style="width: 80px;"/>
+      <html:input id="apikey-grok" type="password" style="flex: 1;" placeholder="xai-..."/>
+      <button id="test-grok" label="Test" oncommand="LlmSummarizerPrefs.testProvider('grok')"/>
+    </hbox>
+    <hbox align="center" style="margin-top: 4px;">
+      <label value="Model:" style="width: 80px;"/>
+      <menulist id="model-grok" style="flex: 1;">
+        <menupopup id="model-grok-popup"/>
+      </menulist>
+    </hbox>
+    <description id="status-grok" style="margin-top: 4px;"/>
+  </groupbox>
+
   <!-- Gemini Settings -->
   <groupbox id="provider-gemini-box">
     <label><html:h2>Gemini (Google)</html:h2></label>
@@ -64,6 +81,24 @@
       </menulist>
     </hbox>
     <description id="status-gemini" style="margin-top: 4px;"/>
+  </groupbox>
+
+  <!-- Ollama (Local) Settings -->
+  <groupbox id="provider-ollama-box">
+    <label><html:h2>Ollama (Local LLM)</html:h2></label>
+    <html:p style="margin: 0 0 8px 0; color: #666; font-size: 11px;">Run LLMs locally with Ollama. Enter "enabled" to activate. Default: http://localhost:11434</html:p>
+    <hbox align="center">
+      <label value="Enable:" style="width: 80px;"/>
+      <html:input id="apikey-ollama" type="text" style="flex: 1;" placeholder="Type 'enabled' to activate Ollama"/>
+      <button id="test-ollama" label="Test" oncommand="LlmSummarizerPrefs.testProvider('ollama')"/>
+    </hbox>
+    <hbox align="center" style="margin-top: 4px;">
+      <label value="Model:" style="width: 80px;"/>
+      <menulist id="model-ollama" style="flex: 1;">
+        <menupopup id="model-ollama-popup"/>
+      </menulist>
+    </hbox>
+    <description id="status-ollama" style="margin-top: 4px;"/>
   </groupbox>
 
   <!-- OpenRouter Settings -->

@@ -6,9 +6,13 @@ var LlmSummarizerPrefs = {
   providers: {
     claude: { name: 'Claude (Anthropic)', icon: '🟠' },
     openai: { name: 'OpenAI', icon: '🟢' },
+    grok: { name: 'Grok (xAI)', icon: '⚡' },
     gemini: { name: 'Gemini (Google)', icon: '🔵' },
+    ollama: { name: 'Ollama (Local)', icon: '🦙' },
     openrouter: { name: 'OpenRouter', icon: '🟣' }
   },
+
+  providerList: ['claude', 'openai', 'grok', 'gemini', 'ollama', 'openrouter'],
 
   models: {
     claude: [
@@ -25,10 +29,27 @@ var LlmSummarizerPrefs = {
       { id: 'gpt-4o', name: 'GPT-4o' },
       { id: 'gpt-4o-mini', name: 'GPT-4o Mini' }
     ],
+    grok: [
+      { id: 'grok-3', name: 'Grok 3 (Latest)' },
+      { id: 'grok-3-mini', name: 'Grok 3 Mini (Fast)' },
+      { id: 'grok-4', name: 'Grok 4' },
+      { id: 'grok-4-fast', name: 'Grok 4 Fast' }
+    ],
     gemini: [
       { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash (Latest)' },
       { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite (Fast)' },
       { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite' }
+    ],
+    ollama: [
+      { id: 'llama3.3', name: 'Llama 3.3 (Default)' },
+      { id: 'llama3.2', name: 'Llama 3.2' },
+      { id: 'mistral', name: 'Mistral' },
+      { id: 'mixtral', name: 'Mixtral' },
+      { id: 'qwen2.5', name: 'Qwen 2.5' },
+      { id: 'deepseek-r1', name: 'DeepSeek R1' },
+      { id: 'phi4', name: 'Phi-4' },
+      { id: 'gemma2', name: 'Gemma 2' },
+      { id: 'codellama', name: 'Code Llama' }
     ],
     openrouter: [
       // DeepSeek
@@ -43,7 +64,7 @@ var LlmSummarizerPrefs = {
       { id: 'mistralai/mistral-large-2411', name: 'Mistral Large' },
       { id: 'mistralai/mistral-small-3.1-24b-instruct', name: 'Mistral Small 3.1' },
       { id: 'mistralai/codestral-2508', name: 'Codestral' },
-      // Grok
+      // Grok via OpenRouter
       { id: 'x-ai/grok-3', name: 'Grok 3' },
       { id: 'x-ai/grok-3-mini', name: 'Grok 3 Mini (Fast)' },
       // Claude via OpenRouter
@@ -87,7 +108,7 @@ var LlmSummarizerPrefs = {
 
   loadAllPreferences: function() {
     // Load API keys
-    ['claude', 'openai', 'gemini', 'openrouter'].forEach(provider => {
+    this.providerList.forEach(provider => {
       const input = document.getElementById('apikey-' + provider);
       if (input) {
         input.value = this.getPref('apiKey.' + provider) || '';
@@ -118,7 +139,7 @@ var LlmSummarizerPrefs = {
 
   setupAllEventListeners: function() {
     // API key inputs
-    ['claude', 'openai', 'gemini', 'openrouter'].forEach(provider => {
+    this.providerList.forEach(provider => {
       const input = document.getElementById('apikey-' + provider);
       if (input) {
         input.addEventListener('change', () => {
@@ -156,7 +177,7 @@ var LlmSummarizerPrefs = {
   // ==================== Model Dropdowns ====================
 
   populateAllModelDropdowns: function() {
-    ['claude', 'openai', 'gemini', 'openrouter'].forEach(provider => {
+    this.providerList.forEach(provider => {
       this.populateModelDropdown(provider);
     });
   },
@@ -202,7 +223,7 @@ var LlmSummarizerPrefs = {
     }
 
     // Get chain order
-    const chainStr = this.getPref('providerChain') || 'claude,openai,gemini,openrouter';
+    const chainStr = this.getPref('providerChain') || this.providerList.join(',');
     const chain = chainStr.split(',').filter(p => this.providers[p]);
 
     // Build list items
@@ -232,7 +253,11 @@ var LlmSummarizerPrefs = {
       // Status indicator
       const statusLabel = document.createXULElement('label');
       statusLabel.setAttribute('id', 'chain-status-' + providerId);
-      statusLabel.setAttribute('value', hasKey ? '✓ Key set' : '○ No key');
+      // For Ollama, show different status text
+      const statusText = providerId === 'ollama'
+        ? (hasKey ? '✓ Enabled' : '○ Disabled')
+        : (hasKey ? '✓ Key set' : '○ No key');
+      statusLabel.setAttribute('value', statusText);
       statusLabel.style.cssText = 'color: ' + (hasKey ? 'green' : '#999') + ';';
       row.appendChild(statusLabel);
 
@@ -260,7 +285,7 @@ var LlmSummarizerPrefs = {
     if (!this.draggedItem || this.draggedItem === targetProviderId) return;
 
     // Get current chain
-    const chainStr = this.getPref('providerChain') || 'claude,openai,gemini,openrouter';
+    const chainStr = this.getPref('providerChain') || this.providerList.join(',');
     const chain = chainStr.split(',');
 
     // Remove dragged item
@@ -281,7 +306,7 @@ var LlmSummarizerPrefs = {
   onDragEnd: function() {
     this.draggedItem = null;
     // Reset all opacities
-    ['claude', 'openai', 'gemini', 'openrouter'].forEach(p => {
+    this.providerList.forEach(p => {
       const row = document.getElementById('chain-item-' + p);
       if (row) row.style.opacity = '1';
     });
@@ -290,11 +315,14 @@ var LlmSummarizerPrefs = {
   // ==================== Status Updates ====================
 
   updateProviderStatuses: function() {
-    ['claude', 'openai', 'gemini', 'openrouter'].forEach(provider => {
+    this.providerList.forEach(provider => {
       const hasKey = !!this.getPref('apiKey.' + provider);
       const statusEl = document.getElementById('chain-status-' + provider);
       if (statusEl) {
-        statusEl.setAttribute('value', hasKey ? '✓ Key set' : '○ No key');
+        const statusText = provider === 'ollama'
+          ? (hasKey ? '✓ Enabled' : '○ Disabled')
+          : (hasKey ? '✓ Key set' : '○ No key');
+        statusEl.setAttribute('value', statusText);
         statusEl.style.color = hasKey ? 'green' : '#999';
       }
 
@@ -323,9 +351,19 @@ var LlmSummarizerPrefs = {
     const apiKeyInput = document.getElementById('apikey-' + provider);
     const apiKey = apiKeyInput ? apiKeyInput.value : '';
 
-    if (!apiKey) {
+    // Ollama doesn't need a real API key, just needs to be enabled
+    if (!apiKey && provider !== 'ollama') {
       if (statusEl) {
         statusEl.textContent = 'Please enter an API key first.';
+        statusEl.style.color = 'red';
+      }
+      return;
+    }
+
+    // For Ollama, check if it's enabled
+    if (provider === 'ollama' && !apiKey) {
+      if (statusEl) {
+        statusEl.textContent = 'Enter "enabled" or any text to enable Ollama.';
         statusEl.style.color = 'red';
       }
       return;
