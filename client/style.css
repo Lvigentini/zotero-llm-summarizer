@@ -1,0 +1,42 @@
+/* LLM Summarizer Styles */
+
+/* Summary note styling */
+.llm-summary {
+  line-height: 1.6;
+}
+
+.llm-summary h2,
+.llm-summary h3,
+.llm-summary h4 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.llm-summary ul,
+.llm-summary ol {
+  margin-left: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.llm-summary li {
+  margin-bottom: 0.25em;
+}
+
+.llm-summary p {
+  margin-bottom: 0.5em;
+}
+
+/* Preferences pane styling */
+#zotero-llm-summarizer-prefs groupbox {
+  margin-bottom: 12px;
+  padding: 8px;
+}
+
+#zotero-llm-summarizer-prefs .header {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+#zotero-llm-summarizer-prefs description {
+  font-size: 0.9em;
+}

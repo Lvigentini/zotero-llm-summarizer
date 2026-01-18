@@ -1,0 +1,107 @@
+<vbox id="zotero-llm-summarizer-prefs"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+      xmlns:html="http://www.w3.org/1999/xhtml"
+      onload="LlmSummarizerPrefs.init()">
+
+  <!-- Provider Chain Order -->
+  <groupbox>
+    <label><html:h2>Provider Priority (Drag to Reorder)</html:h2></label>
+    <html:p style="margin: 0 0 8px 0; color: #666;">First provider with a valid API key will be used. Drag to change fallback order.</html:p>
+    <vbox id="provider-chain-list" style="border: 1px solid #ccc; padding: 4px; border-radius: 4px;">
+      <!-- Populated dynamically -->
+    </vbox>
+    <hbox style="margin-top: 8px;">
+      <checkbox id="enable-fallback" label="Auto-fallback to next provider on error" oncommand="LlmSummarizerPrefs.onFallbackChange()"/>
+    </hbox>
+  </groupbox>
+
+  <!-- Claude Settings -->
+  <groupbox id="provider-claude-box">
+    <label><html:h2>Claude (Anthropic)</html:h2></label>
+    <hbox align="center">
+      <label value="API Key:" style="width: 80px;"/>
+      <html:input id="apikey-claude" type="password" style="flex: 1;" placeholder="sk-ant-..."/>
+      <button id="test-claude" label="Test" oncommand="LlmSummarizerPrefs.testProvider('claude')"/>
+    </hbox>
+    <hbox align="center" style="margin-top: 4px;">
+      <label value="Model:" style="width: 80px;"/>
+      <menulist id="model-claude" style="flex: 1;">
+        <menupopup id="model-claude-popup"/>
+      </menulist>
+    </hbox>
+    <description id="status-claude" style="margin-top: 4px;"/>
+  </groupbox>
+
+  <!-- OpenAI Settings -->
+  <groupbox id="provider-openai-box">
+    <label><html:h2>OpenAI</html:h2></label>
+    <hbox align="center">
+      <label value="API Key:" style="width: 80px;"/>
+      <html:input id="apikey-openai" type="password" style="flex: 1;" placeholder="sk-..."/>
+      <button id="test-openai" label="Test" oncommand="LlmSummarizerPrefs.testProvider('openai')"/>
+    </hbox>
+    <hbox align="center" style="margin-top: 4px;">
+      <label value="Model:" style="width: 80px;"/>
+      <menulist id="model-openai" style="flex: 1;">
+        <menupopup id="model-openai-popup"/>
+      </menulist>
+    </hbox>
+    <description id="status-openai" style="margin-top: 4px;"/>
+  </groupbox>
+
+  <!-- Gemini Settings -->
+  <groupbox id="provider-gemini-box">
+    <label><html:h2>Gemini (Google)</html:h2></label>
+    <hbox align="center">
+      <label value="API Key:" style="width: 80px;"/>
+      <html:input id="apikey-gemini" type="password" style="flex: 1;" placeholder="AIza..."/>
+      <button id="test-gemini" label="Test" oncommand="LlmSummarizerPrefs.testProvider('gemini')"/>
+    </hbox>
+    <hbox align="center" style="margin-top: 4px;">
+      <label value="Model:" style="width: 80px;"/>
+      <menulist id="model-gemini" style="flex: 1;">
+        <menupopup id="model-gemini-popup"/>
+      </menulist>
+    </hbox>
+    <description id="status-gemini" style="margin-top: 4px;"/>
+  </groupbox>
+
+  <!-- OpenRouter Settings -->
+  <groupbox id="provider-openrouter-box">
+    <label><html:h2>OpenRouter</html:h2></label>
+    <hbox align="center">
+      <label value="API Key:" style="width: 80px;"/>
+      <html:input id="apikey-openrouter" type="password" style="flex: 1;" placeholder="sk-or-..."/>
+      <button id="test-openrouter" label="Test" oncommand="LlmSummarizerPrefs.testProvider('openrouter')"/>
+    </hbox>
+    <hbox align="center" style="margin-top: 4px;">
+      <label value="Model:" style="width: 80px;"/>
+      <menulist id="model-openrouter" style="flex: 1;">
+        <menupopup id="model-openrouter-popup"/>
+      </menulist>
+    </hbox>
+    <description id="status-openrouter" style="margin-top: 4px;"/>
+  </groupbox>
+
+  <!-- Output Settings -->
+  <groupbox>
+    <label><html:h2>Output Settings</html:h2></label>
+    <hbox align="center">
+      <label value="Format:" style="width: 80px;"/>
+      <radiogroup id="output-format" orient="horizontal">
+        <radio value="markdown" label="Markdown"/>
+        <radio value="plain" label="Plain Text"/>
+      </radiogroup>
+    </hbox>
+  </groupbox>
+
+  <!-- Advanced Settings -->
+  <groupbox>
+    <label><html:h2>Advanced</html:h2></label>
+    <vbox>
+      <label value="Custom Prompt (optional - overrides default)"/>
+      <html:textarea id="custom-prompt" rows="4" style="width: 100%;" placeholder="Leave empty to use default research synthesis prompt..."></html:textarea>
+    </vbox>
+  </groupbox>
+
+</vbox>

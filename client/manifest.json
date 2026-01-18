@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "LLM Summarizer",
+  "version": "0.0.1",
+  "description": "AI-powered summarization for Zotero notes using Claude, OpenAI, Gemini, or OpenRouter",
+  "applications": {
+    "zotero": {
+      "id": "zotero-llm-summarizer@cogentixai.com",
+      "update_url": "https://github.com/lvigentini/zotero-llm-summarizer/releases/download/release/updates.json",
+      "strict_min_version": "6.999",
+      "strict_max_version": "7.0.*"
+    }
+  }
+}
