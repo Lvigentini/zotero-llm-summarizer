@@ -1,215 +1,205 @@
-# Zotero LLM Summarizer
+# 🤖 Zotero LLM Summarizer
 
-A Zotero 7 plugin that generates AI-powered summaries of research notes using multiple LLM providers.
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/Lvigentini/zotero-llm-summarizer/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Zotero](https://img.shields.io/badge/Zotero-7.0+-red.svg)](https://www.zotero.org/)
 
-## Features
+> **AI-powered research note summarisation for Zotero 7** — Transform your research notes into structured academic summaries using multiple LLM providers.
 
-- **Multi-Provider Support**: Configure and use multiple LLM providers simultaneously
-  - Claude (Anthropic)
-  - OpenAI (GPT-4.1)
-  - Grok (xAI)
-  - Google Gemini
-  - Ollama (Local LLMs)
-  - OpenRouter (access to DeepSeek, Qwen, Mistral, and more)
+---
 
-- **Smart Provider Selection**: Right-click context menu shows available providers with API keys configured
+## ✨ Features at a Glance
 
-- **Fallback Chain**: Configure provider priority order with automatic fallback on errors
+| Feature | Description |
+|---------|-------------|
+| 🔄 **Multi-Provider** | 6 LLM providers with automatic fallback |
+| 📑 **Batch Processing** | Summarise multiple items at once |
+| 📋 **Digest Mode** | Combine notes from multiple sources |
+| 🏷️ **Smart Tagging** | Auto-tag summaries for easy filtering |
+| 🎯 **Research-Focused** | Academic prompt optimised for synthesis |
+| ⚙️ **Customisable** | Custom prompts for your workflow |
 
-- **Drag-and-Drop Priority**: Easily reorder provider priority in settings
+---
 
-- **Research-Focused Prompt**: Built-in prompt optimized for academic research synthesis including:
-  - Key findings and main arguments
-  - Methodology assessment
-  - Important concepts and definitions
-  - Relevance and implications
-  - Citation network analysis
+## 🔌 Supported Providers
 
-- **Flexible Output**: Choose between Markdown or plain text formatting
+| Provider | Icon | Type | Models |
+|----------|------|------|--------|
+| **Claude** | 🟠 | Direct API | Sonnet 4.5, Opus 4.5, Haiku 4.5 |
+| **OpenAI** | 🟢 | Direct API | GPT-4.1, GPT-4.1 Mini, GPT-4o |
+| **Grok** | ⚡ | Direct API | Grok 3, Grok 3 Mini, Grok 4 |
+| **Gemini** | 🔵 | Direct API | Gemini 2.0 Flash, 2.5 Flash Lite |
+| **Ollama** | 🦙 | Local | Llama 3.3, Mistral, Qwen, DeepSeek |
+| **OpenRouter** | 🟣 | Gateway | 15+ models from multiple providers |
 
-- **Intelligent Note Naming**: Generated notes are prefixed with `[LLM-note]` and named `[LLM-note] Author_Year_Model_summary`
+---
 
-- **Easy Filtering**: All summary notes are automatically tagged with `LLM-note`, `AI`, `summary`, and the model name (e.g., `gpt-4.1`) for flexible filtering in Zotero's Tags pane
-
-## Installation
-
-1. Download the latest `.xpi` file from the [Releases](https://github.com/Lvigentini/zotero-llm-summarizer/releases) page
-2. In Zotero, go to **Tools** → **Add-ons**
-3. Click the gear icon and select **Install Add-on From File...**
-4. Select the downloaded `.xpi` file
-5. Restart Zotero when prompted
-
-## Configuration
-
-1. Go to **Edit** → **Settings** (Windows/Linux) or **Zotero** → **Settings** (macOS)
-2. Click on **LLM Summarizer** in the sidebar
-3. Configure your API keys for the providers you want to use:
-   - **Claude**: Get your API key from [Anthropic Console](https://console.anthropic.com/)
-   - **OpenAI**: Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
-   - **Grok**: Get your API key from [xAI Console](https://console.x.ai/)
-   - **Google Gemini**: Get your API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-   - **Ollama**: Install [Ollama](https://ollama.ai/) locally and type "enabled" in the field
-   - **OpenRouter**: Get your API key from [OpenRouter](https://openrouter.ai/keys)
-
-4. Select your preferred model for each provider
-5. Drag providers in the **Provider Priority** section to set fallback order
-6. Enable/disable **Auto-fallback** as needed
-
-## Usage
-
-1. Select an item in your Zotero library that has child notes attached
-2. Right-click on the item
-3. Choose **Summarize with AI** → Select a provider or use the default chain
-4. Wait for the summary to be generated
-5. A new note will be created as a child of the selected item
-
-## Available Models
-
-### Claude (Direct)
-- Claude Sonnet 4.5 (Latest)
-- Claude Opus 4.5
-- Claude Haiku 4.5 (Fast)
-- Claude Sonnet 4
-- Claude Opus 4
-
-### OpenAI (Direct)
-- GPT-4.1 (Latest)
-- GPT-4.1 Mini
-- GPT-4.1 Nano (Fast)
-- GPT-4o
-- GPT-4o Mini
-
-### Grok (xAI Direct)
-- Grok 3 (Latest)
-- Grok 3 Mini (Fast)
-- Grok 4
-- Grok 4 Fast
-
-### Google Gemini (Direct)
-- Gemini 2.0 Flash (Latest)
-- Gemini 2.0 Flash Lite (Fast)
-- Gemini 2.5 Flash Lite
-
-### Ollama (Local)
-Run LLMs locally on your machine:
-- Llama 3.3 (Default)
-- Llama 3.2
-- Mistral
-- Mixtral
-- Qwen 2.5
-- DeepSeek R1
-- Phi-4
-- Gemma 2
-- Code Llama
-
-### OpenRouter (Access to Many Providers)
-- DeepSeek R1, V3.1 Chat, Chat
-- Qwen 3 (235B, 32B, 14B)
-- Mistral Large, Small 3.1, Codestral
-- Grok 3, Grok 3 Mini
-- Claude, GPT, Gemini, Llama via OpenRouter
-
-## Development
-
-### Prerequisites
-
-- Node.js 18+
-- npm or pnpm
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/Lvigentini/zotero-llm-summarizer.git
-cd zotero-llm-summarizer
-
-# Install dependencies
-npm install
-
-# Build the plugin
-npm run build
-```
-
-### Project Structure
+## 🚀 Quick Start
 
 ```
-zotero-llm-summarizer/
-├── bootstrap.ts          # Plugin lifecycle and context menu
-├── lib.ts                # Core logic: LLM API calls, note handling
-├── client/
-│   ├── prefs.xhtml       # Preferences UI layout
-│   ├── prefs-script.js   # Preferences UI logic
-│   ├── prefs.js          # Default preference values
-│   ├── manifest.json     # Plugin manifest
-│   ├── icon.svg          # Plugin icon
-│   ├── style.css         # Custom styles
-│   └── locale/           # Localization files
-├── build/                # Build output (git-ignored)
-├── xpi/                  # Packaged plugin (git-ignored)
-├── esbuild.js            # Build configuration
-├── tsconfig.json         # TypeScript configuration
-└── package.json          # Project configuration
+1. Download  →  2. Install  →  3. Configure API Key  →  4. Right-click & Summarise!
 ```
 
-### Build Commands
+### Installation
 
-```bash
-npm run build    # Full build with linting
-npm run lint     # Run ESLint
-npm run lint:fix # Fix linting issues
+1. 📥 Download the latest `.xpi` from [**Releases**](https://github.com/Lvigentini/zotero-llm-summarizer/releases)
+2. 🔧 In Zotero: **Tools** → **Add-ons** → ⚙️ → **Install Add-on From File...**
+3. 🔄 Restart Zotero
+
+### First-time Setup
+
+1. Go to **Edit** → **Settings** → **LLM Summarizer**
+2. Enter your API key for at least one provider
+3. Click **Test** to verify connection
+
+---
+
+## 📖 How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        SINGLE ITEM                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   📄 Zotero Item    →    📝 Notes    →    🤖 LLM    →    📋 Summary Note   │
+│   (with notes)           (extracted)      (process)     [LLM-note] tagged  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      MULTIPLE ITEMS                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   📑 Batch Individual:                                           │
+│   Item 1 → Summary 1                                             │
+│   Item 2 → Summary 2                                             │
+│   Item 3 → Summary 3                                             │
+│                                                                  │
+│   📋 Simple Digest:                                              │
+│   Items 1,2,3 notes → Combined Digest Note                       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Creating Releases
+---
 
-1. Update the version in `package.json`
-2. Build the plugin: `npm run build`
-3. Commit changes: `git add -A && git commit -m "Release vX.Y.Z"`
-4. Create a tag: `git tag -a vX.Y.Z -m "Version X.Y.Z"`
-5. Push: `git push && git push --tags`
-6. Go to GitHub → Releases → "Draft a new release"
-7. Select the tag, write release notes, and attach the XPI file from `xpi/` folder
-   - Rename to `zotero-llm-summarizer-X.Y.Z.xpi` before uploading
+## 🎯 Usage
 
-### Testing
+### Single Item Summary
+1. Select an item with notes attached
+2. **Right-click** → **Summarize with AI**
+3. Choose provider or use default chain
 
-1. Build the plugin: `npm run build`
-2. Install the XPI from `xpi/` folder into Zotero
-3. To reload changes, disable and re-enable the plugin in Zotero's Add-ons manager
+### Multi-Item Processing
+1. Select multiple items (Ctrl/Cmd + click)
+2. **Right-click** → **Summarize with AI**
+3. Choose:
+   - 📑 **Batch Individual** — One summary per item
+   - 📋 **Simple Digest** — All notes combined
 
-## Prompts and Customisation
+### Collection Summary
+1. **Right-click** on a collection
+2. **Summarize with AI** → Choose batch or digest
 
-### Default Prompt
+---
 
-The built-in prompt is designed for academic research synthesis. It instructs the LLM to act as a senior research scientist with strengths in big-picture thinking, pattern recognition, and citation network analysis. The default output structure includes:
+## 🏷️ Note Identification
 
-1. **Key Findings and Main Arguments** — Central thesis, primary claims, empirical vs theoretical distinctions
-2. **Methodology** — Research design, sample characteristics, validity concerns, generalisability
-3. **Important Concepts and Definitions** — Key terminology and theoretical frameworks
-4. **Relevance and Implications** — Significance for theory and practice, open questions
-5. **Citation Network Analysis** — Foundational works, intellectual lineages, interdisciplinary bridges
+All generated notes are easy to find:
 
-The prompt emphasises epistemic honesty (hedged language like "suggests" rather than "proves"), synthesis over summary, and actionable insights.
+| Element | Format | Example |
+|---------|--------|---------|
+| **Title** | `[LLM-note] Author_Year_Model_summary` | `[LLM-note] Smith_2024_gpt-4.1_summary` |
+| **Tags** | `LLM-note`, `AI`, `summary`, `{model}` | Filter by any tag in Zotero |
+
+**Finding your summaries:**
+- 🏷️ Click `LLM-note` tag in Tags pane
+- 🔍 Search for `[LLM-note]` in search bar
+- 📁 Create a Saved Search for permanent collection
+
+---
+
+## ⚙️ Configuration
+
+### Provider Priority (Drag & Drop)
+
+```
+┌──────────────────────────────────────┐
+│  Provider Priority                    │
+├──────────────────────────────────────┤
+│  1. 🟠 Claude        ✓ Key set       │  ← Primary
+│  2. 🟢 OpenAI        ✓ Key set       │  ← Fallback 1
+│  3. ⚡ Grok          ○ No key        │
+│  4. 🔵 Gemini        ✓ Key set       │  ← Fallback 2
+│  5. 🦙 Ollama        ○ Disabled      │
+│  6. 🟣 OpenRouter    ○ No key        │
+└──────────────────────────────────────┘
+         ↕ Drag to reorder
+```
+
+### API Key Sources
+
+| Provider | Get API Key |
+|----------|-------------|
+| 🟠 Claude | [console.anthropic.com](https://console.anthropic.com/) |
+| 🟢 OpenAI | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| ⚡ Grok | [console.x.ai](https://console.x.ai/) |
+| 🔵 Gemini | [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) |
+| 🦙 Ollama | [ollama.ai](https://ollama.ai/) — Type `enabled` to activate |
+| 🟣 OpenRouter | [openrouter.ai/keys](https://openrouter.ai/keys) |
+
+---
+
+## 📝 Research Prompt
+
+The default prompt is optimised for academic research synthesis:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  📚 DEFAULT OUTPUT STRUCTURE                                 │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. Key Findings & Main Arguments                            │
+│     └─ Central thesis, claims, empirical vs theoretical      │
+│                                                              │
+│  2. Methodology                                              │
+│     └─ Design, sample, validity, generalisability            │
+│                                                              │
+│  3. Important Concepts & Definitions                         │
+│     └─ Key terminology, theoretical frameworks               │
+│                                                              │
+│  4. Relevance & Implications                                 │
+│     └─ Significance, applications, open questions            │
+│                                                              │
+│  5. Citation Network Analysis                                │
+│     └─ Foundational works, intellectual lineages             │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ### Custom Prompts
 
-You can override the default prompt in **Settings → LLM Summarizer → Advanced**. Leave empty to use the built-in prompt.
+Override in **Settings → Advanced**. Tips:
 
-**Tips for effective custom prompts:**
+| Tip | Example |
+|-----|---------|
+| 🎯 Be specific | "Create exactly 5 bullet points" |
+| 👤 Set persona | "You are a systematic review expert" |
+| 👥 Define audience | "Write for undergraduate students" |
+| 📋 Specify format | "Use markdown tables for comparison" |
+| ⛔ Set constraints | "Maximum 200 words" |
 
-- **Be specific about output structure** — Tell the LLM exactly what sections or headings you want
-- **Define the persona** — "You are a [role] skilled at [task]" helps set appropriate tone and expertise
-- **Specify the audience** — "Write for graduate students" vs "Write for domain experts" yields different results
-- **Include formatting instructions** — Request bullet points, numbered lists, tables, or specific markdown formatting
-- **Set constraints** — Word limits, required sections, or things to avoid (e.g., "Do not include recommendations")
+<details>
+<summary><b>📄 Example Custom Prompts</b></summary>
 
-**Example custom prompts:**
-
+**Literature Review Style:**
 ```
 Summarise these notes as a literature review paragraph suitable for a thesis chapter.
 Focus on how the studies relate to each other and identify gaps in the research.
 Use formal academic language and include in-text citations where authors are mentioned.
 ```
 
+**Structured Summary:**
 ```
 Create a structured summary with these exact sections:
 - Research Question
@@ -219,38 +209,194 @@ Create a structured summary with these exact sections:
 - How this relates to [your specific research topic]
 ```
 
+**Journal Club:**
 ```
 You are a research assistant helping prepare for a journal club presentation.
 Summarise the key points that would generate discussion, highlight methodological
 choices that could be debated, and suggest 3 discussion questions for the group.
 ```
 
-## Error Handling
+</details>
 
-- Errors are logged to Zotero's debug output (Help → Debug Output Logging)
-- When fallback is enabled, the plugin will automatically try the next provider in the chain if an error occurs
-- The success message shows which provider and model was actually used
+---
 
-## License
+## 📊 Available Models
 
-MIT License - see [LICENSE](LICENSE) file for details.
+<details>
+<summary><b>🟠 Claude (Anthropic)</b></summary>
 
-## Contributing
+| Model | Speed | Use Case |
+|-------|-------|----------|
+| Claude Sonnet 4.5 | ⚡⚡ | Best balance (default) |
+| Claude Opus 4.5 | ⚡ | Highest quality |
+| Claude Haiku 4.5 | ⚡⚡⚡ | Fastest, budget-friendly |
+| Claude Sonnet 4 | ⚡⚡ | Previous generation |
+| Claude Opus 4 | ⚡ | Previous generation |
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+</details>
+
+<details>
+<summary><b>🟢 OpenAI</b></summary>
+
+| Model | Speed | Use Case |
+|-------|-------|----------|
+| GPT-4.1 | ⚡⚡ | Latest, best quality |
+| GPT-4.1 Mini | ⚡⚡⚡ | Fast & affordable |
+| GPT-4.1 Nano | ⚡⚡⚡⚡ | Fastest |
+| GPT-4o | ⚡⚡ | Multimodal |
+| GPT-4o Mini | ⚡⚡⚡ | Compact multimodal |
+
+</details>
+
+<details>
+<summary><b>⚡ Grok (xAI)</b></summary>
+
+| Model | Speed | Use Case |
+|-------|-------|----------|
+| Grok 3 | ⚡⚡ | Latest |
+| Grok 3 Mini | ⚡⚡⚡ | Fast |
+| Grok 4 | ⚡⚡ | Newest |
+| Grok 4 Fast | ⚡⚡⚡ | Speed optimised |
+
+</details>
+
+<details>
+<summary><b>🔵 Gemini (Google)</b></summary>
+
+| Model | Speed | Use Case |
+|-------|-------|----------|
+| Gemini 2.0 Flash | ⚡⚡⚡ | Fast, capable |
+| Gemini 2.0 Flash Lite | ⚡⚡⚡⚡ | Fastest |
+| Gemini 2.5 Flash Lite | ⚡⚡⚡ | Latest lite |
+
+</details>
+
+<details>
+<summary><b>🦙 Ollama (Local)</b></summary>
+
+| Model | Size | Use Case |
+|-------|------|----------|
+| Llama 3.3 | 70B | Best local quality |
+| Llama 3.2 | 3B | Lightweight |
+| Mistral | 7B | Fast, efficient |
+| Mixtral | 8x7B | MoE, powerful |
+| Qwen 2.5 | Various | Multilingual |
+| DeepSeek R1 | Various | Reasoning |
+| Phi-4 | 14B | Microsoft |
+| Gemma 2 | 9B | Google |
+
+</details>
+
+<details>
+<summary><b>🟣 OpenRouter (Gateway)</b></summary>
+
+Access 15+ models including:
+- DeepSeek R1, V3.1 Chat
+- Qwen 3 (235B, 32B, 14B)
+- Mistral Large, Small, Codestral
+- Grok 3, Claude, GPT, Gemini, Llama
+
+</details>
+
+---
+
+## 🛠️ Development
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Quick Start
+
+```bash
+git clone https://github.com/Lvigentini/zotero-llm-summarizer.git
+cd zotero-llm-summarizer
+npm install
+npm run build
+```
+
+### Project Structure
+
+```
+zotero-llm-summarizer/
+├── 📄 bootstrap.ts       # Plugin lifecycle & menus
+├── 📄 lib.ts             # Core LLM logic
+├── 📁 client/
+│   ├── prefs.xhtml       # Settings UI
+│   ├── prefs-script.js   # Settings logic
+│   ├── prefs.js          # Default values
+│   └── icon.svg          # Plugin icon
+├── 📁 docs/
+│   └── ROADMAP-premium-features.md
+└── 📁 xpi/               # Built plugin
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run build` | Build plugin |
+| `npm run lint` | Check code |
+| `npm run lint -- --fix` | Auto-fix issues |
+
+### Release Process
+
+```bash
+# 1. Update version in package.json
+# 2. Build
+npm run build
+
+# 3. Commit & tag
+git add -A && git commit -m "Release vX.Y.Z"
+git tag -a vX.Y.Z -m "Version X.Y.Z"
+
+# 4. Push
+git push && git push --tags
+
+# 5. Create GitHub Release with XPI attachment
+```
+
+---
+
+## ❓ Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Menu doesn't appear | Ensure item has child notes |
+| API error | Check API key in Settings |
+| Slow response | Try a faster model (Mini/Lite) |
+| Wrong formatting | Check "Output Format" setting |
+
+**Debug logs:** Help → Debug Output Logging
+
+---
+
+## 📜 License
+
+MIT License — see [LICENSE](LICENSE)
+
+---
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
 
-## Acknowledgments
+---
 
-- Built using the [generator-zotero-plugin](https://github.com/nickmcintyre/generator-zotero-plugin) scaffold
-- Inspired by the [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)
-- Thanks to the Zotero development community
+## 🙏 Acknowledgments
 
-## Support
+- [generator-zotero-plugin](https://github.com/nickmcintyre/generator-zotero-plugin)
+- [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)
+- Zotero development community
 
-If you encounter issues or have feature requests, please [open an issue](https://github.com/Lvigentini/zotero-llm-summarizer/issues) on GitHub.
+---
+
+<p align="center">
+  <b>Questions or issues?</b><br>
+  <a href="https://github.com/Lvigentini/zotero-llm-summarizer/issues">Open an Issue</a>
+</p>
