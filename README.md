@@ -6,6 +6,8 @@
 
 > **AI-powered research note summarisation for Zotero 7** — Transform your research notes into structured academic summaries using multiple LLM providers.
 
+> 🔑 **BYO Key Philosophy**: This plugin uses your own API keys — no middleman, no subscription fees, no data collection. You pay only for what you use, directly to your chosen provider. And if you are lucky enough to have your own setup, we strongly support open source, so you will be able to connect your favorite model via OLLAMA.
+
 ---
 
 ## ✨ Features at a Glance
@@ -29,8 +31,9 @@
 | **OpenAI** | 🟢 | Direct API | GPT-4.1, GPT-4.1 Mini, GPT-4o |
 | **Grok** | ⚡ | Direct API | Grok 3, Grok 3 Mini, Grok 4 |
 | **Gemini** | 🔵 | Direct API | Gemini 2.0 Flash, 2.5 Flash Lite |
-| **Ollama** | 🦙 | Local | Llama 3.3, Mistral, Qwen, DeepSeek |
 | **OpenRouter** | 🟣 | Gateway | 15+ models from multiple providers |
+| **Ollama** | 🦙 | Local | Llama 3.3, Mistral, Qwen, DeepSeek |
+
 
 ---
 
@@ -179,7 +182,9 @@ The default prompt is optimised for academic research synthesis:
 
 ### Custom Prompts
 
-Override in **Settings → Advanced**. Tips:
+Override in **Settings → Advanced**. 
+Bear in mind that LLM models are different, so consider what you want to achieve. These are general tips to ensure you get what you want from the LLM in the most efficient way
+
 
 | Tip | Example |
 |-----|---------|
@@ -290,17 +295,35 @@ choices that could be debated, and suggest 3 discussion questions for the group.
 <details>
 <summary><b>🟣 OpenRouter (Gateway)</b></summary>
 
-Access 15+ models including:
-- DeepSeek R1, V3.1 Chat
-- Qwen 3 (235B, 32B, 14B)
-- Mistral Large, Small, Codestral
-- Grok 3, Claude, GPT, Gemini, Llama
+OpenRouter acts as a unified gateway to multiple AI providers with a single API key. This is useful when you want access to many models without managing separate accounts.
+
+| Model | Provider | Use Case |
+|-------|----------|----------|
+| DeepSeek R1 | DeepSeek | Advanced reasoning |
+| DeepSeek V3.1 Chat | DeepSeek | Fast chat |
+| Qwen 3 235B | Alibaba | Largest open model |
+| Qwen 3 32B/14B | Alibaba | Balanced options |
+| Mistral Large | Mistral | Enterprise quality |
+| Mistral Small | Mistral | Cost-effective |
+| Codestral | Mistral | Code-focused |
+| Grok 3 | xAI | Via gateway |
+| Claude, GPT, Gemini | Various | Alternative access |
+| Llama 3.3 70B | Meta | Open source |
+
+**How it works:**
+1. Get one API key from [openrouter.ai/keys](https://openrouter.ai/keys)
+2. Select OpenRouter as your provider in settings
+3. Choose any model from the dropdown — all accessible with the same key
+4. OpenRouter routes your request to the appropriate provider
+
+**Pricing:** Pay-per-use, often cheaper than direct API access for some models.
 
 </details>
 
 ---
 
 ## 🛠️ Development
+This section is only relevant to understand how the plugin is developed and how to contribute.
 
 ### Prerequisites
 
@@ -340,23 +363,6 @@ zotero-llm-summarizer/
 | `npm run lint` | Check code |
 | `npm run lint -- --fix` | Auto-fix issues |
 
-### Release Process
-
-```bash
-# 1. Update version in package.json
-# 2. Build
-npm run build
-
-# 3. Commit & tag
-git add -A && git commit -m "Release vX.Y.Z"
-git tag -a vX.Y.Z -m "Version X.Y.Z"
-
-# 4. Push
-git push && git push --tags
-
-# 5. Create GitHub Release with XPI attachment
-```
-
 ---
 
 ## ❓ Troubleshooting
@@ -393,6 +399,7 @@ MIT License — see [LICENSE](LICENSE)
 - [generator-zotero-plugin](https://github.com/nickmcintyre/generator-zotero-plugin)
 - [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template)
 - Zotero development community
+- 🤖 [Claude](https://claude.ai) — AI pair programmer for code review and repository management
 
 ---
 
